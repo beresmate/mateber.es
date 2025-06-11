@@ -14,4 +14,13 @@ jobs:
         run: |
           mkdir -p dist
           cp -r src/* dist/
-          ls -la
+
+      - name: Deploy files using SCP
+        uses: appleboy/scp-action@v0.1.0
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: octobot
+          key: ${{ secrets.OCTOBOT_SSH_PRIVATE_KEY }}
+          port: 22
+          source: "dist/*"
+          target: "/var/www/mateber.es/html"
