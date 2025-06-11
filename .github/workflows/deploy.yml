@@ -25,11 +25,24 @@ jobs:
           script: |
             rm -rf /var/www/mateber.es/html/*
 
-      - name: Deploy files using rsync
-        uses: appleboy/rsync-action@v0.1.6
+      - name: Deploy files using SCP
+        uses: appleboy/scp-action@v0.1.0
         with:
-          args: --delete -avz dist/ /var/www/mateber.es/html/
           host: ${{ secrets.DROPLET_HOST }}
           username: octobot
           key: ${{ secrets.OCTOBOT_SSH_PRIVATE_KEY }}
           port: 22
+          source: "dist/."
+          target: "/var/www/mateber.es/html/"
+
+      - name: Flatten deployed directory
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: octobot
+          key: ${{ secrets.OCTOBOT_SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            if [ -d /var/www/mateber.es/html/dist ]; then
+              mv /var/www/mateber.es/html/dist/* /var/www/mateber.es/html/ && rm -rf /var/www/mateber.es/html/dist
+            fi
