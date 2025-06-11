@@ -15,6 +15,16 @@ jobs:
           mkdir -p dist
           cp -r src/* dist/
 
+      - name: Clean target directory
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: octobot
+          key: ${{ secrets.OCTOBOT_SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            rm -rf /var/www/mateber.es/html/*
+
       - name: Deploy files using SCP
         uses: appleboy/scp-action@v0.1.0
         with:
@@ -22,5 +32,5 @@ jobs:
           username: octobot
           key: ${{ secrets.OCTOBOT_SSH_PRIVATE_KEY }}
           port: 22
-          source: "dist/*"
+          source: "dist/.*"
           target: "/var/www/mateber.es/html"
